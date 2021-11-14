@@ -1,7 +1,11 @@
+import random
+
 import numpy as np
 
-
 # -----------------------------4.1---------------------------
+import lab2
+
+
 def B_matrix():
     B = np.array([[1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1], [1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1],
                   [0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1], [1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1],
@@ -102,15 +106,67 @@ def check_G(r, m):
     g = G(r, m)
     return np.concatenate((eye, g))
 
+
+# ------------------------------------------------------------
+
+# -----------------------------4.4, 4.5-----------------------
+def get_code_word(matrix, k):
+    k_word = []
+    for i in range(k):
+        k_word.append(lab2.round_num(random.uniform(0, 1)))
+    n_word = lab2.code_word_from_k_to_n(matrix, k_word) % 2
+    return n_word
+
+
+def RM_decode(r, m):
+    g_matrix = G(r, m)
+    check_matrix = check_G(r, m)
+    error_num_arr = [1, 2] if m == 3 else [1, 2, 3, 4]
+    for error_num in error_num_arr:
+        n_word = get_code_word(g_matrix, g_matrix.shape[0])
+        n_word_error = []
+        if error_num == 1:
+            n_word_error = lab2.make_single_mistake_in_n_word(n_word) % 2
+        if error_num == 2:
+            n_word_error = lab2.make_double_mistake_in_n_word(n_word) % 2
+        if error_num == 3:
+            n_word_error = lab2.make_triple_mistake_in_n_word(n_word) % 2
+        if error_num == 4:
+            n_word_error = lab2.make_quadro_mistake_in_n_word(n_word) % 2
+
+        n_word_error_1 = [-1 if x == 0 else x for x in n_word_error]
+        decode_word = n_word_error_1 @ check_matrix
+        max_val = max(decode_word, key=abs)
+        index_of_max = decode_word.index(max_val)
+        index_of_max_1 = index_of_max
+
+        fixed_word = []
+        for i in range(m):
+            fixed_word[i] = index_of_max_1 % 2
+            index_of_max_1 = index_of_max_1 / 2
+        fixed_word.insert(0, 1 if decode_word[index_of_max] >= 0 else 0)
+        if (np.array_equiv(n_word, fixed_word @ g_matrix)):
+            print("Ошибка для r = {}, m = {}, кратности ошибки = {}: ИСПРАВЛЕНА".format(r, m, error_num))
+        else:
+            print("Ошибка для r = {}, m = {}, кратности ошибки = {}: НЕ ИСПРАВЛЕНА".format(r, m, error_num))
+
+
 # ------------------------------------------------------------
 
 
 if __name__ == '__main__':
     # -------print 4.1----------
-    # print(gen_matr_gol())
-    # print(check_matr_gol())
+    a = gen_matr_gol()
+    h = check_matr_gol()
+    print(gen_matr_gol())
+    print(check_matr_gol())
     # -------print 4.2----------
     res = decode()
     # -------print 4.3----------
-    #print(G(3, 4))
-    #print(check_G(3, 4))
+    # print(G(3, 4))
+    # print(check_G(3, 4))
+    # -------print 4.4----------
+    RM_decode(1, 3)
+    # -------print 4.5----------
+    RM_decode(1, 4)
+
