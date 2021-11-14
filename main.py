@@ -100,12 +100,31 @@ def G(r, m):
         result = np.vstack((string1, string2))
     return result
 
+def K_mult(a, b):
+    isFirst1 = True
+    result = []
+    for a_i in a:
+        string = []
+        isFirst2 = True
+        for a_ij in a_i:
+            if(isFirst2):
+                string = a_ij * b
+                isFirst2 = False
+            else:
+                string = np.hstack((string, a_ij * b))
+        if(isFirst1):
+            result = string
+            isFirst1 = False
+        else:
+            result = np.concatenate((result, string))
+    return result
 
-def check_G(r, m):
-    eye = np.eye(pow(2, m))
-    g = G(r, m)
-    return np.concatenate((eye, g))
-
+def H(i, m):
+    H = np.array([[1,1],
+                  [1,-1]])
+    eye1 = np.eye(pow(2, m-i))
+    eye2 = np.eye(pow(2, i-1))
+    return K_mult(K_mult(eye1, H), eye2)
 
 # ------------------------------------------------------------
 
@@ -164,7 +183,7 @@ if __name__ == '__main__':
     res = decode()
     # -------print 4.3----------
     # print(G(3, 4))
-    # print(check_G(3, 4))
+    # print(H(3, 4))
     # -------print 4.4----------
     RM_decode(1, 3)
     # -------print 4.5----------
