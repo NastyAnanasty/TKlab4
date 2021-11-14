@@ -126,6 +126,12 @@ def H(i, m):
     eye2 = np.eye(pow(2, i-1))
     return K_mult(K_mult(eye1, H), eye2)
 
+def get_H(m):
+    h = H(1, m)
+    for i in range(2, m + 1):
+        h = h @ H(i, m)
+    return h
+
 # ------------------------------------------------------------
 
 # -----------------------------4.4, 4.5-----------------------
@@ -139,7 +145,7 @@ def get_code_word(matrix, k):
 
 def RM_decode(r, m):
     g_matrix = G(r, m)
-    check_matrix = check_G(r, m)
+    check_matrix = get_H(m)
     error_num_arr = [1, 2] if m == 3 else [1, 2, 3, 4]
     for error_num in error_num_arr:
         n_word = get_code_word(g_matrix, g_matrix.shape[0])
@@ -156,15 +162,16 @@ def RM_decode(r, m):
         n_word_error_1 = [-1 if x == 0 else x for x in n_word_error]
         decode_word = n_word_error_1 @ check_matrix
         max_val = max(decode_word, key=abs)
-        index_of_max = decode_word.index(max_val)
+        indexes_arr = np.where(decode_word == max_val)
+        index_of_max = indexes_arr[0][0]
         index_of_max_1 = index_of_max
 
         fixed_word = []
         for i in range(m):
-            fixed_word[i] = index_of_max_1 % 2
-            index_of_max_1 = index_of_max_1 / 2
+            fixed_word.append(index_of_max_1 % 2)
+            index_of_max_1 = index_of_max_1 // 2
         fixed_word.insert(0, 1 if decode_word[index_of_max] >= 0 else 0)
-        if (np.array_equiv(n_word, fixed_word @ g_matrix)):
+        if np.array_equiv(n_word, (fixed_word @ g_matrix) % 2):
             print("Ошибка для r = {}, m = {}, кратности ошибки = {}: ИСПРАВЛЕНА".format(r, m, error_num))
         else:
             print("Ошибка для r = {}, m = {}, кратности ошибки = {}: НЕ ИСПРАВЛЕНА".format(r, m, error_num))
