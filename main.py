@@ -31,7 +31,7 @@ def decode():
     small_wold = np.random.randint(0, 2, (1, 12))
     word = np.dot(small_wold, gen_matr_gol()) % 2
     print("Отправленное сообщение:", word)
-    mistake = np.array([1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+    mistake = np.array([1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
     er_word = (word + mistake) % 2
     print("Принятое сообщение:", er_word)
     h = check_matr_gol()
@@ -77,7 +77,7 @@ def decode():
                         return u
                     # ------------пункт 7--------------------
                 if j == b.shape[0] - 1:
-                    return print("Ошибка не найдена, оправьте повторно сообщение")
+                    return print("Ошибка не определена, оправьте повторно сообщение")
 
 
 # -----------------------------4.3---------------------------
@@ -110,7 +110,7 @@ if __name__ == '__main__':
     # print(gen_matr_gol())
     # print(check_matr_gol())
     # -------print 4.2----------
-    # res = decode()
+    res = decode()
     # -------print 4.3----------
-    print(G(3, 4))
-    print(check_G(3, 4))
+    #print(G(3, 4))
+    #print(check_G(3, 4))
